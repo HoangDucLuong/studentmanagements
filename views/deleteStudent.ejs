@@ -1,0 +1,23 @@
+<!-- views/deleteStudent.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Your styling for deleteStudent page goes here */
+    </style>
+    <title>Delete Student</title>
+</head>
+
+<body>
+    <h1>Delete Student</h1>
+    <p>Are you sure you want to delete the student <%= student.name %>?</p>
+    <form action="/deleteStudent/<%= student._id %>" method="post">
+        <button type="submit">Yes, Delete</button>
+        <a href="/students">Cancel</a>
+    </form>
+</body>
+
+</html>
