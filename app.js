@@ -36,6 +36,15 @@ app.listen(port, hostname, () => {
 });
 const Student = require("./models/Student");
 const User = require("./models/User");
+const requireLogin = (req, res, next) => {
+  if (req.session.user) {
+    // Nếu đã đăng nhập, cho phép tiếp tục
+    next();
+  } else {
+    // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
+    res.redirect("/login");
+  }
+};
 
 // ... (Phần code kết nối MongoDB)
 
@@ -82,7 +91,7 @@ app.post("/signup", async (req, res) => {
   res.redirect("/login");
 });
 
-app.get("/dashboard", async (req, res) => {
+app.get("/dashboard",requireLogin, async (req, res) => {
   try {
     if (req.session.user) {
       // Lấy danh sách sinh viên từ MongoDB
@@ -106,7 +115,7 @@ app.get("/logout", (req, res) => {
 });
 
 
-app.post("/addStudent", async (req, res) => {
+app.post("/addStudent",requireLogin, async (req, res) => {
   try {
     const { id, name, address, phoneNumber, age, grade } = req.body;
 
@@ -133,7 +142,7 @@ app.post("/addStudent", async (req, res) => {
 
 
 app.js
-app.get("/students", async (req, res) => {
+app.get("/students",requireLogin, async (req, res) => {
   try {
     // Lấy danh sách sinh viên từ MongoDB
     const students = await Student.find();
@@ -147,7 +156,7 @@ app.get("/students", async (req, res) => {
 });
 
 // Update the route for deleting a student using findByIdAndDelete
-app.get("/deleteStudent/:id", async (req, res) => {
+app.get("/deleteStudent/:id",requireLogin, async (req, res) => {
   try {
     const studentId = req.params.id;
 
@@ -163,7 +172,7 @@ app.get("/deleteStudent/:id", async (req, res) => {
 });
 
 
-app.get("/updateStudent/:id", async (req, res) => {
+app.get("/updateStudent/:id", requireLogin,async (req, res) => {
   try {
     const studentId = req.params.id;
 
@@ -178,7 +187,7 @@ app.get("/updateStudent/:id", async (req, res) => {
   }
 });
 
-app.post("/updateStudent/:id", async (req, res) => {
+app.post("/updateStudent/:id",requireLogin, async (req, res) => {
   try {
     const studentId = req.params.id;
     const { name, address, phoneNumber, age, grade } = req.body;
@@ -199,14 +208,4 @@ app.post("/updateStudent/:id", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
-
-const authenticateMiddleware = (req, res, next) => {
-  if (req.session.user) {
-    next();
-  } else {
-    res.redirect("/login");
-  }
-};
-
-app.use(["/dashboard", "/students", "/addStudent", "/deleteStudent", "/updateStudent"], authenticateMiddleware);
 
